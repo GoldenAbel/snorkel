@@ -53,11 +53,13 @@ class ExternalAnnotationsLoader(object):
         for k, v in d.iteritems():
             q = q.filter(getattr(self.candidate_class, k) == v)
         candidate = q.first()
-        if candidate is None and self.expand_candidate_set:
+        if candidate is not None:
+            self.candidate_set.append(candidate)
+        elif candidate is None and self.expand_candidate_set:
             candidate = self.candidate_class(**d)
             self.session.add(candidate)
             self.candidate_set.append(candidate)
-        elif candidate is None:
+        else:
             raise ValueError('Candidate %s not found in CandidateSet, and expand_candidate_set is False.'
                              % tuple(context.id for context in d.values()))
 
